@@ -1,0 +1,186 @@
+--// SETTINGS
+local CorrectKey = "lunnhubontop"
+local BeamLink = "https://roblox.com.ge/communities/620464943/"
+
+--// SERVICES
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+--// GUI
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0,0,0,0)
+Frame.Position = UDim2.new(0.5,0,0.5,0)
+Frame.AnchorPoint = Vector2.new(0.5,0.5)
+Frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
+Frame.BorderSizePixel = 0
+
+local UICorner = Instance.new("UICorner", Frame)
+UICorner.CornerRadius = UDim.new(0,12)
+
+-- Open Animation
+TweenService:Create(Frame,TweenInfo.new(0.4,Enum.EasingStyle.Back),{
+	Size = UDim2.new(0,380,0,230)
+}):Play()
+
+-- Title Bar
+local TitleBar = Instance.new("Frame", Frame)
+TitleBar.Size = UDim2.new(1,0,0,40)
+TitleBar.BackgroundColor3 = Color3.fromRGB(25,25,25)
+TitleBar.BorderSizePixel = 0
+
+local TitleCorner = Instance.new("UICorner", TitleBar)
+TitleCorner.CornerRadius = UDim.new(0,12)
+
+local Title = Instance.new("TextLabel", TitleBar)
+Title.Size = UDim2.new(1,-40,1,0)
+Title.Position = UDim2.new(0,10,0,0)
+Title.BackgroundTransparency = 1
+Title.Text = "LUNN HUB SCRIPT KEY"
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.Font = Enum.Font.GothamBold
+Title.TextScaled = true
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Minimize Button
+local Minimize = Instance.new("TextButton", TitleBar)
+Minimize.Size = UDim2.new(0,30,0,30)
+Minimize.Position = UDim2.new(1,-35,0.5,-15)
+Minimize.Text = "-"
+Minimize.BackgroundColor3 = Color3.fromRGB(35,35,35)
+Minimize.TextColor3 = Color3.fromRGB(255,255,255)
+Minimize.Font = Enum.Font.GothamBold
+Minimize.TextScaled = true
+
+local MinCorner = Instance.new("UICorner", Minimize)
+MinCorner.CornerRadius = UDim.new(0,8)
+
+-- Content Holder
+local Content = Instance.new("Frame", Frame)
+Content.Size = UDim2.new(1,0,1,-40)
+Content.Position = UDim2.new(0,0,0,40)
+Content.BackgroundTransparency = 1
+
+-- Key Box
+local KeyBox = Instance.new("TextBox", Content)
+KeyBox.Size = UDim2.new(0.8,0,0,40)
+KeyBox.Position = UDim2.new(0.1,0,0.2,0)
+KeyBox.PlaceholderText = "Enter Key..."
+KeyBox.BackgroundColor3 = Color3.fromRGB(30,30,30)
+KeyBox.TextColor3 = Color3.fromRGB(255,255,255)
+KeyBox.Font = Enum.Font.Gotham
+KeyBox.TextScaled = true
+
+Instance.new("UICorner", KeyBox).CornerRadius = UDim.new(0,10)
+
+-- Buttons
+local function CreateButton(text,posX)
+	local Btn = Instance.new("TextButton", Content)
+	Btn.Size = UDim2.new(0.35,0,0,40)
+	Btn.Position = UDim2.new(posX,0,0.55,0)
+	Btn.Text = text
+	Btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
+	Btn.TextColor3 = Color3.fromRGB(255,255,255)
+	Btn.Font = Enum.Font.GothamBold
+	Btn.TextScaled = true
+	
+	Instance.new("UICorner", Btn).CornerRadius = UDim.new(0,10)
+	
+	return Btn
+end
+
+local CheckButton = CreateButton("CHECK",0.1)
+local GetKeyButton = CreateButton("GET KEY",0.55)
+
+-- Status
+local Status = Instance.new("TextLabel", Content)
+Status.Size = UDim2.new(1,0,0,25)
+Status.Position = UDim2.new(0,0,0.85,0)
+Status.BackgroundTransparency = 1
+Status.TextColor3 = Color3.fromRGB(255,255,255)
+Status.TextScaled = true
+Status.Font = Enum.Font.Gotham
+
+-- Draggable
+local dragging, dragInput, dragStart, startPos
+
+TitleBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = Frame.Position
+		
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+TitleBar.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		local delta = input.Position - dragStart
+		Frame.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- Minimize Logic (Title only visible)
+local Minimized = false
+
+Minimize.MouseButton1Click:Connect(function()
+	if not Minimized then
+		Minimized = true
+		Minimize.Text = "+"
+		
+		TweenService:Create(Frame,TweenInfo.new(0.3),{
+			Size = UDim2.new(0,380,0,40)
+		}):Play()
+		
+		Content.Visible = false
+	else
+		Minimized = false
+		Minimize.Text = "-"
+		
+		Content.Visible = true
+		
+		TweenService:Create(Frame,TweenInfo.new(0.3),{
+			Size = UDim2.new(0,380,0,230)
+		}):Play()
+	end
+end)
+
+-- Key Check
+CheckButton.MouseButton1Click:Connect(function()
+	if KeyBox.Text == CorrectKey then
+		Status.Text = "Access Granted"
+		Status.TextColor3 = Color3.fromRGB(0,255,0)
+		wait(0.8)
+		ScreenGui:Destroy()
+		
+		-- PUT YOUR MAIN SCRIPT HERE
+		
+	else
+		Status.Text = "Wrong Key"
+		Status.TextColor3 = Color3.fromRGB(255,0,0)
+	end
+end)
+
+-- Get Key
+GetKeyButton.MouseButton1Click:Connect(function()
+	setclipboard(BeamLink)
+	Status.Text = "Link Copied"
+	Status.TextColor3 = Color3.fromRGB(0,170,255)
+end)
